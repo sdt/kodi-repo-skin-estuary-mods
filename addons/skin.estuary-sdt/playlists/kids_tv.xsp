@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<smartplaylist type="tvshows">
+    <name>Kids TV Shows</name>
+    <match>all</match>
+    <rule field="path" operator="startswith">
+        <value>/srv/media/video/kids-tv/</value>
+    </rule>
+    <order direction="ascending">sorttitle</order>
+</smartplaylist>

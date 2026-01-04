@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<smartplaylist type="movies">
+    <name>Unwatched Parents Movies</name>
+    <match>all</match>
+    <rule field="path" operator="startswith">
+        <value>/srv/media/video/parents-movie/</value>
+    </rule>
+    <rule field="playcount" operator="is">
+        <value>0</value>
+    </rule>
+    <limit>15</limit>
+    <order direction="descending">random</order>
+</smartplaylist>
