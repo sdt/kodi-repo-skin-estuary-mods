@@ -319,10 +319,15 @@ void CVideoPlayerAudio::Process()
                 m_messageQueue.GetLevel(), m_audioSink.GetDelay());
 
       double delay = m_audioSink.GetDelay();
-      if (pts > m_audioClock - delay + 0.5 * DVD_TIME_BASE)
-      {
-        m_audioSink.Flush();
-      }
+      // DIAGNOSTIC: Commenting out flush to test if this is the root cause of missing initial audio
+      // if (pts > m_audioClock - delay + 0.5 * DVD_TIME_BASE)
+      // {
+      //   m_audioSink.Flush();
+      // }
+      CLog::Log(LOGINFO,
+                "CVideoPlayerAudio - DIAGNOSTIC: Flush disabled. pts={:f}, m_audioClock={:f}, delay={:f}, "
+                "would_flush={}", pts, m_audioClock, delay,
+                (pts > m_audioClock - delay + 0.5 * DVD_TIME_BASE) ? "YES" : "NO");
       m_audioClock = pts + delay;
       if (m_speed != DVD_PLAYSPEED_PAUSE)
         m_audioSink.Resume();
