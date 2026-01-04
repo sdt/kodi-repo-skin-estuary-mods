@@ -954,7 +954,10 @@ double CDVDDemuxFFmpeg::ConvertTimestamp(int64_t pts, int den, int num)
     if (timestamp > starttime || m_checkTransportStream)
       timestamp -= starttime;
     // allow for largest possible difference in pts and dts for a single packet
-    else if (timestamp + 0.5 > starttime)
+    // Increased threshold from 0.5 to 1.5 seconds to handle edge cases where
+    // the first keyframe after seeking to start is further from container start_time
+    // This prevents timestamp desync issues with external subtitles (see issue #26647)
+    else if (timestamp + 1.5 > starttime)
       timestamp = 0;
   }
 
