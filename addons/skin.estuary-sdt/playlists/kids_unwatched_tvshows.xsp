@@ -2,8 +2,8 @@
 <smartplaylist type="tvshows">
     <name>Unwatched Kids TV Shows</name>
     <match>all</match>
-    <rule field="path" operator="startswith">
-        <value>/srv/media/video/kids-tv/</value>
+    <rule field="path" operator="contains">
+        <value>/kids-tv/</value>
     </rule>
     <rule field="numwatched" operator="is">
         <value>0</value>

@@ -294,7 +294,7 @@
 						<pagecontrol>6010</pagecontrol>
 						<include content="WidgetListPoster" condition="Library.HasContent(tvshows)">
 							<!-- https://forum.kodi.tv/showthread.php?tid=341640 -->
-							<param name="content_path" value="videodb://inprogresstvshows?xsp=%7B%22rules%22%3A%7B%22and%22%3A%5B%7B%22field%22%3A%22path%22%2C%22operator%22%3A%22startswith%22%2C%22value%22%3A%22%2Fsrv%2Fmedia%2Fvideo%2Fkids-tv%2F%22%7D%5D%7D%2C%22type%22%3A%22tvshows%22%7D"/>
+							<param name="content_path" value="videodb://inprogresstvshows?xsp=%7B%22rules%22%3A%7B%22and%22%3A%5B%7B%22field%22%3A%22path%22%2C%22operator%22%3A%22contains%22%2C%22value%22%3A%22%2Fkids-tv%2F%22%7D%5D%7D%2C%22type%22%3A%22tvshows%22%7D"/>
 							<param name="sortby" value="lastplayed"/>
 							<param name="sortorder" value="descending"/>
 							<param name="widget_header" value="$LOCALIZE[626]"/>
@@ -336,7 +336,7 @@
 						<pagecontrol>6010</pagecontrol>
 						<include content="WidgetListPoster" condition="Library.HasContent(tvshows)">
 							<!-- https://forum.kodi.tv/showthread.php?tid=341640 -->
-							<param name="content_path" value="videodb://inprogresstvshows?xsp=%7B%22rules%22%3A%7B%22and%22%3A%5B%7B%22field%22%3A%22path%22%2C%22operator%22%3A%22startswith%22%2C%22value%22%3A%22%2Fsrv%2Fmedia%2Fvideo%2Fparents-tv%2F%22%7D%5D%7D%2C%22type%22%3A%22tvshows%22%7D"/>
+							<param name="content_path" value="videodb://inprogresstvshows?xsp=%7B%22rules%22%3A%7B%22and%22%3A%5B%7B%22field%22%3A%22path%22%2C%22operator%22%3A%22contains%22%2C%22value%22%3A%22%2Fparents-tv%2F%22%7D%5D%7D%2C%22type%22%3A%22tvshows%22%7D"/>
 							<param name="sortby" value="lastplayed"/>
 							<param name="sortorder" value="descending"/>
 							<param name="widget_header" value="$LOCALIZE[626]"/>

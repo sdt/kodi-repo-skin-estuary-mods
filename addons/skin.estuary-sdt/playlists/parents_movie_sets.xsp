@@ -2,8 +2,8 @@
 <smartplaylist type="movies">
     <name>Parents Movie Sets</name>
     <match>all</match>
-    <rule field="path" operator="startswith">
-        <value>/srv/media/video/parents-movie/</value>
+    <rule field="path" operator="contains">
+        <value>/parents-movie/</value>
     </rule>
     <rule field="set" operator="contains">
         <value>Collection</value>

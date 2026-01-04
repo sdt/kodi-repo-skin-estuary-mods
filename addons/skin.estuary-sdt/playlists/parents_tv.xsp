@@ -2,8 +2,8 @@
 <smartplaylist type="tvshows">
     <name>Parents TV</name>
     <match>all</match>
-    <rule field="path" operator="startswith">
-        <value>/srv/media/video/parents-tv/</value>
+    <rule field="path" operator="contains">
+        <value>/parents-tv/</value>
     </rule>
     <order direction="ascending">sorttitle</order>
 </smartplaylist>

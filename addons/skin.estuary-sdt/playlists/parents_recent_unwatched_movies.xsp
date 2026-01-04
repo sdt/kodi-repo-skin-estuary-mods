@@ -2,8 +2,8 @@
 <smartplaylist type="movies">
     <name>Recent Unwatched Parents Movies</name>
     <match>all</match>
-    <rule field="path" operator="startswith">
-        <value>/srv/media/video/parents-movie/</value>
+    <rule field="path" operator="contains">
+        <value>/parents-movie/</value>
     </rule>
     <rule field="dateadded" operator="after">
         <value>2012-01-01</value>
