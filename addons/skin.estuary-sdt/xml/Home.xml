@@ -325,6 +325,48 @@
 						<param name="scrollbar_id" value="106010"/>
 					</include>
 				</control>
+				<control type="group" id="116000">
+					<!-- PARENTS TV -->
+					<visible>String.IsEqual(Container(9000).ListItem.Property(id),parents_tv)</visible>
+					<include content="Visible_Right_Delayed">
+						<param name="id" value="parents_tv"/>
+					</include>
+					<control type="grouplist" id="116001">
+						<include>WidgetGroupListCommon</include>
+						<pagecontrol>6010</pagecontrol>
+						<include content="WidgetListPoster" condition="Library.HasContent(tvshows)">
+							<!-- https://forum.kodi.tv/showthread.php?tid=341640 -->
+							<param name="content_path" value="videodb://inprogresstvshows?xsp=%7B%22rules%22%3A%7B%22and%22%3A%5B%7B%22field%22%3A%22path%22%2C%22operator%22%3A%22startswith%22%2C%22value%22%3A%22%2Fsrv%2Fmedia%2Fvideo%2Fparents-tv%2F%22%7D%5D%7D%2C%22type%22%3A%22tvshows%22%7D"/>
+							<param name="sortby" value="lastplayed"/>
+							<param name="sortorder" value="descending"/>
+							<param name="widget_header" value="$LOCALIZE[626]"/>
+							<param name="widget_target" value="videos"/>
+							<param name="list_id" value="116100"/>
+						</include>
+						<include content="WidgetListEpisodes" condition="Library.HasContent(tvshows)">
+							<param name="content_path" value="special://skin/playlists/parents_recent_unwatched_episodes.xsp"/>
+							<param name="widget_header" value="$LOCALIZE[20387]"/>
+							<param name="widget_target" value="videos"/>
+							<param name="list_id" value="116200"/>
+						</include>
+						<include content="WidgetListPoster" condition="Library.HasContent(tvshows)">
+							<param name="content_path" value="special://skin/playlists/parents_unwatched_tvshows.xsp"/>
+							<param name="widget_header" value="$LOCALIZE[31122]"/>
+							<param name="widget_target" value="videos"/>
+							<param name="list_id" value="116300"/>
+						</include>
+					</control>
+					<include content="ImageWidget" condition="!Library.HasContent(tvshows)">
+						<param name="text_label" value="$LOCALIZE[31104]" />
+						<param name="button_label" value="$LOCALIZE[31110]" />
+						<param name="button_onclick" value="ActivateWindow(videos,files,return)"/>
+						<param name="button_id" value="116400"/>
+						<param name="button2_onclick" value="Skin.SetBool(HomeMenuNoTVShowButton)"/>
+					</include>
+					<include content="WidgetScrollbar" condition="Skin.HasSetting(touchmode)">
+						<param name="scrollbar_id" value="116010"/>
+					</include>
+				</control>
 				<control type="group" id="7000">
 					<visible>String.IsEqual(Container(9000).ListItem.Property(id),music)</visible>
 					<include content="Visible_Right_Delayed">
@@ -1110,6 +1152,13 @@
 							<property name="menu_id">$NUMBER[115000]</property>
 							<thumb>icons/sidemenu/movies.png</thumb>
 							<property name="id">parents_movies</property>
+						</item>
+						<item>
+							<label>Parents TV</label>
+							<onclick>ActivateWindow(Videos,"special://skin/playlists/parents_tv.xsp",return)</onclick>
+							<property name="menu_id">$NUMBER[116000]</property>
+							<thumb>icons/sidemenu/tv.png</thumb>
+							<property name="id">parents_tv</property>
 						</item>
 						<item>
 							<label>$LOCALIZE[20343]</label>
