@@ -146,7 +146,7 @@
 							<param name="list_id" value="105400"/>
 						</include>
 						<include content="WidgetListPoster" condition="Library.HasContent(movies)">
-							<param name="content_path" value="special://skin/playlists/kids_movie_sets.xsp"/>
+							<!-- param name="content_path" value="special://skin/playlists/kids_movie_sets.xsp"/ -->
 							<param name="widget_header" value="$LOCALIZE[31075]"/>
 							<param name="widget_target" value="videos"/>
 							<param name="sortby" value="random"/>
@@ -198,7 +198,7 @@
 							<param name="list_id" value="115400"/>
 						</include>
 						<include content="WidgetListPoster" condition="Library.HasContent(movies)">
-							<param name="content_path" value="special://skin/playlists/parents_movie_sets.xsp"/>
+							<!-- param name="content_path" value="special://skin/playlists/parents_movie_sets.xsp"/ -->
 							<param name="widget_header" value="$LOCALIZE[31075]"/>
 							<param name="widget_target" value="videos"/>
 							<param name="sortby" value="random"/>
