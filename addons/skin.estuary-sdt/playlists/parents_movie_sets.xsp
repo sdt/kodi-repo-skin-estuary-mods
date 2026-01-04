@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<smartplaylist type="movies">
+    <name>Parents Movie Sets</name>
+    <match>all</match>
+    <rule field="path" operator="startswith">
+        <value>/srv/media/video/parents-movie/</value>
+    </rule>
+    <rule field="set" operator="contains">
+        <value>Collection</value>
+    </rule>
+    <order direction="ascending">sorttitle</order>
+</smartplaylist>
