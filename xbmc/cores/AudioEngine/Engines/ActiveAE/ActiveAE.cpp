@@ -1984,6 +1984,17 @@ bool CActiveAE::RunStages()
         double maxError = ((*it)->m_syncState == CAESyncInfo::SYNC_INSYNC) ? 1000 : 5000;
         double error = playingPts - (*it)->m_pClock->GetClock();
 
+        // DIAGNOSTIC: Log sync error calculation for initial samples
+        static int diagCount = 0;
+        if (diagCount < 5 && pts < 1000) // Log first 5 times when PTS < 1 second
+        {
+          CLog::Log(LOGWARNING, "ActiveAE - DIAGNOSTIC sync error calc: pts={:.2f}ms, delay={:.2f}ms, "
+                    "playingPts={:.2f}ms, clock={:.2f}ms, error={:.2f}ms, syncState={}",
+                    pts, delay, playingPts, (*it)->m_pClock->GetClock(), error,
+                    static_cast<int>((*it)->m_syncState));
+          diagCount++;
+        }
+
         // underestimate error for TrueHD passthrough
         // oscillations should be less than frametime 40ms to avoid unnecessary a/v sync corrections
         if (isTrueHDPassthrough)
@@ -2491,6 +2502,18 @@ CSampleBuffer* CActiveAE::SyncStream(CActiveAEStream *stream)
       int framesToSkip = -error / 1000 * buf->pkt->config.sample_rate;
       if (framesToSkip > buf->pkt->nb_samples)
         framesToSkip = buf->pkt->nb_samples;
+
+      // DIAGNOSTIC: Log when frames would be skipped
+      if (framesToSkip > 0)
+      {
+        double bufPts = buf->timestamp - (buf->pkt_start_offset * 1000 / buf->pkt->config.sample_rate);
+        double skipDurationMs = (double)framesToSkip * 1000 / buf->pkt->config.sample_rate;
+        CLog::Log(LOGWARNING, "ActiveAE::SyncStream - DIAGNOSTIC: Would skip {} frames ({:.2f}ms) - "
+                  "error={:.2f}ms, buf_pts={:.2f}ms, buf_samples={}, clock={:.2f}ms",
+                  framesToSkip, skipDurationMs, error, bufPts, buf->pkt->nb_samples,
+                  stream->m_pClock->GetClock());
+      }
+
       if (m_mode == MODE_TRANSCODE)
       {
         if (framesToSkip > (int) (m_encoderFormat.m_frames / 2))
@@ -2509,15 +2532,21 @@ CSampleBuffer* CActiveAE::SyncStream(CActiveAEStream *stream)
       }
       else
       {
-        int bytesToSkip = framesToSkip * buf->pkt->bytes_per_sample *
-                                  buf->pkt->config.channels / buf->pkt->planes;
-        for (int i=0; i<buf->pkt->planes; i++)
+        // DIAGNOSTIC: Temporarily disable frame skipping to test if this is the root cause
+        // int bytesToSkip = framesToSkip * buf->pkt->bytes_per_sample *
+        //                           buf->pkt->config.channels / buf->pkt->planes;
+        // for (int i=0; i<buf->pkt->planes; i++)
+        // {
+        //   memmove(buf->pkt->data[i], buf->pkt->data[i]+bytesToSkip, buf->pkt->linesize - bytesToSkip);
+        // }
+        // buf->pkt->nb_samples -= framesToSkip;
+        // stream->m_syncError.Correction((double)framesToSkip * 1000 / buf->pkt->config.sample_rate);
+        // error += (double)framesToSkip * 1000 / buf->pkt->config.sample_rate;
+
+        if (framesToSkip > 0)
         {
-          memmove(buf->pkt->data[i], buf->pkt->data[i]+bytesToSkip, buf->pkt->linesize - bytesToSkip);
+          CLog::Log(LOGWARNING, "ActiveAE::SyncStream - DIAGNOSTIC: Frame skipping DISABLED for testing");
         }
-        buf->pkt->nb_samples -= framesToSkip;
-        stream->m_syncError.Correction((double)framesToSkip * 1000 / buf->pkt->config.sample_rate);
-        error += (double)framesToSkip * 1000 / buf->pkt->config.sample_rate;
       }
     }
 
