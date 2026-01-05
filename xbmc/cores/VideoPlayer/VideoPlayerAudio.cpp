@@ -319,8 +319,17 @@ void CVideoPlayerAudio::Process()
                 m_messageQueue.GetLevel(), m_audioSink.GetDelay());
 
       double delay = m_audioSink.GetDelay();
+
+      // DIAGNOSTIC: Log resync details
+      bool wouldFlush = (pts > m_audioClock - delay + 0.5 * DVD_TIME_BASE);
+      CLog::Log(LOGWARNING, "CVideoPlayerAudio - DIAGNOSTIC RESYNC: pts={:.2f}ms, m_audioClock={:.2f}ms, "
+                "delay={:.2f}ms, wouldFlush={}, syncState={}",
+                pts / 1000.0, m_audioClock / 1000.0, delay / 1000.0, wouldFlush ? "YES" : "NO",
+                static_cast<int>(m_syncState));
+
       if (pts > m_audioClock - delay + 0.5 * DVD_TIME_BASE)
       {
+        CLog::Log(LOGWARNING, "CVideoPlayerAudio - DIAGNOSTIC: Flushing audio sink");
         m_audioSink.Flush();
       }
       m_audioClock = pts + delay;
@@ -404,6 +413,17 @@ void CVideoPlayerAudio::Process()
     {
       DemuxPacket* pPacket = std::static_pointer_cast<CDVDMsgDemuxerPacket>(pMsg)->GetPacket();
       bool bPacketDrop = std::static_pointer_cast<CDVDMsgDemuxerPacket>(pMsg)->GetPacketDrop();
+
+      // DIAGNOSTIC: Log first few packets
+      static int packetCount = 0;
+      if (packetCount < 10)
+      {
+        CLog::Log(LOGWARNING, "CVideoPlayerAudio - DIAGNOSTIC packet #{}: pts={:.2f}ms, dts={:.2f}ms, "
+                  "size={}, drop={}, syncState={}",
+                  packetCount, pPacket->pts / 1000.0, pPacket->dts / 1000.0,
+                  pPacket->iSize, bPacketDrop, static_cast<int>(m_syncState));
+        packetCount++;
+      }
 
       if (bPacketDrop)
       {
@@ -554,6 +574,17 @@ bool CVideoPlayerAudio::ProcessDecoderOutput(DVDAudioFrame &audioframe)
   }
 
   int framesOutput = m_audioSink.AddPackets(audioframe);
+
+  // DIAGNOSTIC: Log first few AddPackets calls
+  static int addPacketCount = 0;
+  if (addPacketCount < 15)
+  {
+    CLog::Log(LOGWARNING, "CVideoPlayerAudio - DIAGNOSTIC AddPackets call #{}: pts={:.2f}ms, "
+              "nb_frames={}, framesOutput={}, duration={:.2f}ms, m_audioClock={:.2f}ms, syncState={}",
+              addPacketCount, audioframe.pts / 1000.0, audioframe.nb_frames, framesOutput,
+              audioframe.duration / 1000.0, m_audioClock / 1000.0, static_cast<int>(m_syncState));
+    addPacketCount++;
+  }
 
   // guess next pts
   m_audioClock += audioframe.duration * ((double)framesOutput / audioframe.nb_frames);

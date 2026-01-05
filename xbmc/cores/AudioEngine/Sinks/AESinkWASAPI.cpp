@@ -277,6 +277,11 @@ unsigned int CAESinkWASAPI::AddPackets(uint8_t **data, unsigned int frames, unsi
 
   if (!m_running) //first time called, pre-fill buffer then start audio client
   {
+    // DIAGNOSTIC: Log first call to AddPackets
+    CLog::Log(LOGWARNING, "AESinkWASAPI::AddPackets - DIAGNOSTIC: First call (m_running=false), "
+              "requesting {} frames ({:.2f}ms) with SILENT flag. Actual audio data NOT written!",
+              NumFramesRequested, (double)NumFramesRequested * 1000.0 / m_format.m_sampleRate);
+
     hr = m_pAudioClient->Reset();
     if (FAILED(hr))
     {
@@ -309,6 +314,8 @@ unsigned int CAESinkWASAPI::AddPackets(uint8_t **data, unsigned int frames, unsi
     if (FAILED(hr))
       CLog::LogF(LOGERROR, "AudioClient Start Failed");
     m_running = true; //signal that we're processing frames
+
+    CLog::Log(LOGWARNING, "AESinkWASAPI::AddPackets - DIAGNOSTIC: Audio client started, returning 0 frames added");
     return 0U;
   }
 
