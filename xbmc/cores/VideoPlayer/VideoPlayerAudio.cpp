@@ -319,8 +319,17 @@ void CVideoPlayerAudio::Process()
                 m_messageQueue.GetLevel(), m_audioSink.GetDelay());
 
       double delay = m_audioSink.GetDelay();
+
+      // DIAGNOSTIC: Log resync details
+      bool wouldFlush = (pts > m_audioClock - delay + 0.5 * DVD_TIME_BASE);
+      CLog::Log(LOGWARNING, "CVideoPlayerAudio - DIAGNOSTIC RESYNC: pts={:.2f}ms, m_audioClock_before={:.2f}ms, "
+                "delay={:.2f}ms, wouldFlush={}, syncState={}, new_audioClock_will_be={:.2f}ms",
+                pts / 1000.0, m_audioClock / 1000.0, delay / 1000.0, wouldFlush ? "YES" : "NO",
+                static_cast<int>(m_syncState), (pts + delay) / 1000.0);
+
       if (pts > m_audioClock - delay + 0.5 * DVD_TIME_BASE)
       {
+        CLog::Log(LOGWARNING, "CVideoPlayerAudio - DIAGNOSTIC: FLUSHING audio sink!");
         m_audioSink.Flush();
       }
       m_audioClock = pts + delay;
@@ -405,6 +414,17 @@ void CVideoPlayerAudio::Process()
       DemuxPacket* pPacket = std::static_pointer_cast<CDVDMsgDemuxerPacket>(pMsg)->GetPacket();
       bool bPacketDrop = std::static_pointer_cast<CDVDMsgDemuxerPacket>(pMsg)->GetPacketDrop();
 
+      // DIAGNOSTIC: Log first 20 packets
+      static int packetCount = 0;
+      if (packetCount < 20)
+      {
+        CLog::Log(LOGWARNING, "CVideoPlayerAudio - DIAGNOSTIC packet #{}: pts={:.2f}ms, dts={:.2f}ms, "
+                  "size={}, drop={}, syncState={}, m_audioClock={:.2f}ms",
+                  packetCount, pPacket->pts / 1000.0, pPacket->dts / 1000.0,
+                  pPacket->iSize, bPacketDrop, static_cast<int>(m_syncState), m_audioClock / 1000.0);
+        packetCount++;
+      }
+
       if (bPacketDrop)
       {
         if (m_syncState != IDVDStreamPlayer::SYNC_STARTING)
@@ -466,6 +486,15 @@ bool CVideoPlayerAudio::ProcessDecoderOutput(DVDAudioFrame &audioframe)
     }
     else
     {
+      // DIAGNOSTIC: Log first 10 times m_audioClock is set from frame PTS
+      static int clockSetCount = 0;
+      if (clockSetCount < 10)
+      {
+        CLog::Log(LOGWARNING, "CVideoPlayerAudio - DIAGNOSTIC: Setting m_audioClock from frame PTS: "
+                  "old={:.2f}ms, new={:.2f}ms, syncState={}",
+                  m_audioClock / 1000.0, audioframe.pts / 1000.0, static_cast<int>(m_syncState));
+        clockSetCount++;
+      }
       m_audioClock = audioframe.pts;
     }
 
@@ -554,6 +583,17 @@ bool CVideoPlayerAudio::ProcessDecoderOutput(DVDAudioFrame &audioframe)
   }
 
   int framesOutput = m_audioSink.AddPackets(audioframe);
+
+  // DIAGNOSTIC: Log first 30 AddPackets calls
+  static int addPacketCount = 0;
+  if (addPacketCount < 30)
+  {
+    CLog::Log(LOGWARNING, "CVideoPlayerAudio - DIAGNOSTIC AddPackets call #{}: pts={:.2f}ms, "
+              "nb_frames={}, framesOutput={}, duration={:.2f}ms, m_audioClock_before={:.2f}ms, syncState={}",
+              addPacketCount, audioframe.pts / 1000.0, audioframe.nb_frames, framesOutput,
+              audioframe.duration / 1000.0, m_audioClock / 1000.0, static_cast<int>(m_syncState));
+    addPacketCount++;
+  }
 
   // guess next pts
   m_audioClock += audioframe.duration * ((double)framesOutput / audioframe.nb_frames);

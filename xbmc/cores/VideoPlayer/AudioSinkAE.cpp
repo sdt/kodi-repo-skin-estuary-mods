@@ -127,6 +127,19 @@ unsigned int CAudioSinkAE::AddPackets(const DVDAudioFrame &audioframe)
   unsigned int total = audioframe.nb_frames - audioframe.framesOut;
   unsigned int frames = total;
   unsigned int offset = audioframe.framesOut;
+
+  // DIAGNOSTIC: Log first 30 calls
+  static int sinkAddPacketCount = 0;
+  bool shouldLog = (sinkAddPacketCount < 30);
+  if (shouldLog)
+  {
+    CLog::Log(LOGWARNING, "CAudioSinkAE::AddPackets - DIAGNOSTIC call #{}: pts={:.2f}ms, "
+              "nb_frames={}, total={}, offset={}, delay={:.2f}ms",
+              sinkAddPacketCount, audioframe.pts / 1000.0, audioframe.nb_frames, total, offset,
+              GetDelay() / 1000.0);
+    sinkAddPacketCount++;
+  }
+
   do
   {
     IAEStream::ExtData ext;
@@ -140,6 +153,14 @@ unsigned int CAudioSinkAE::AddPackets(const DVDAudioFrame &audioframe)
       ext.centerMixLevel = audioframe.centerMixLevel;
     }
     unsigned int copied = m_pAudioStream->AddData(audioframe.data, offset, frames, &ext);
+
+    if (shouldLog && offset == audioframe.framesOut) // First iteration
+    {
+      CLog::Log(LOGWARNING, "CAudioSinkAE::AddPackets - DIAGNOSTIC: AddData returned copied={}, "
+                "frames_requested={}, ext.pts={:.2f}ms",
+                copied, frames, ext.pts);
+    }
+
     offset += copied;
     frames -= copied;
     if (frames <= 0)
@@ -196,7 +217,11 @@ void CAudioSinkAE::Resume()
 {
   std::unique_lock lock(m_critSection);
   if (m_pAudioStream)
+  {
+    CLog::Log(LOGWARNING, "CAudioSinkAE::Resume - DIAGNOSTIC: Resuming audio stream, delay before resume={:.2f}ms",
+              m_pAudioStream->GetDelay() * 1000.0);
     m_pAudioStream->Resume();
+  }
   CLog::Log(LOGDEBUG,"CDVDAudio::Resume - resume audio stream");
 }
 
@@ -218,6 +243,8 @@ void CAudioSinkAE::Flush()
   std::unique_lock lock(m_critSection);
   if (m_pAudioStream)
   {
+    CLog::Log(LOGWARNING, "CAudioSinkAE::Flush - DIAGNOSTIC: Flushing audio stream, delay before flush={:.2f}ms",
+              m_pAudioStream->GetDelay() * 1000.0);
     m_pAudioStream->Flush();
     CLog::Log(LOGDEBUG,"CDVDAudio::Flush - flush audio stream");
   }

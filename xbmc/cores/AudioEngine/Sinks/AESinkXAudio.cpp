@@ -247,6 +247,10 @@ unsigned int CAESinkXAudio::AddPackets(uint8_t **data, unsigned int frames, unsi
 
   if (!m_running) //first time called, pre-fill buffer then start voice
   {
+    CLog::Log(LOGWARNING, "AESinkXAudio::AddPackets - DIAGNOSTIC: First call (m_running=false), "
+              "submitting {} frames ({:.2f}ms) and starting voice",
+              frames, static_cast<double>(frames) / m_format.m_sampleRate * 1000.0);
+
     m_sourceVoice->Stop();
     hr = m_sourceVoice->SubmitSourceBuffer(&xbuffer);
     if (FAILED(hr))
@@ -266,6 +270,8 @@ unsigned int CAESinkXAudio::AddPackets(uint8_t **data, unsigned int frames, unsi
     m_sinkFrames += frames;
     m_framesInBuffers += frames;
     m_running = true; //signal that we're processing frames
+
+    CLog::Log(LOGWARNING, "AESinkXAudio::AddPackets - DIAGNOSTIC: Voice started, returning {} frames", frames);
     return frames;
   }
 
