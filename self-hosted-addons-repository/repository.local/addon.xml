@@ -2,9 +2,9 @@
 <addon id="repository.local" name="Local addons" version="1.0.0" provider-name="sdt">
     <extension point="xbmc.addon.repository" name="Local addons">
         <dir>
-            <info compressed="false">http://tunip:13334/repo/zips/addons.xml</info>
-            <checksum>http://tunip:13334/repo/zips/addons.xml.md5</checksum>
-            <datadir zip="true">http://tunip:13334/repo/zips/</datadir>
+            <info compressed="false">${BASE_URL}repo/zips/addons.xml</info>
+            <checksum>${BASE_URL}repo/zips/addons.xml.md5</checksum>
+            <datadir zip="true">${BASE_URL}repo/zips/</datadir>
         </dir>
     </extension>
     <extension point="xbmc.addon.metadata">
